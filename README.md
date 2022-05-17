@@ -7,9 +7,11 @@ It is currently in alpha, with many essential features missing. Use at your own 
 - [x] Basic map
     - [x] Show bikes on map
     - [x] Gray out unavailable bikes
-    - [ ] Use appropriate icons depending on zoom level
-    - [ ] Don't hardcode the map to only show bikes in Karlsruhe
-        - [ ] Dynamically request available bikes depending on zoom level, map location, and user location
+    - [ ] Use appropriate icons depending on zoom level to keep the map clean
+    - [x] Dynamically request available bikes depending on zoom level, map location, and user location
+        - [ ] Dynamically remove bikes from the map when zooming out far enough
+    - [x] Crash when loading Berlin
+    - [ ] Let users rent bikes from the map
 - [ ] Accounts
     - [ ] Implement account login
     - [ ] Let user view account information
@@ -19,5 +21,5 @@ It is currently in alpha, with many essential features missing. Use at your own 
 - [ ] Renting bikes
     - [ ] Allow renting bikes by entering the id
     - [ ] Allow renting bikes by scanning the QR code
-    - [ ] Allow renting multiple bikes simulatenously
+    - [ ] Allow renting multiple bikes simultaneously
     - [ ] Allow giving back rented bikes

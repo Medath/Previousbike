@@ -3,25 +3,20 @@ package com.example.myapplication
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.util.DisplayMetrics
-import android.view.Display
 import androidx.core.content.ContextCompat
 
 import org.osmdroid.config.Configuration.*
+import org.osmdroid.events.*
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
-import org.osmdroid.util.GeoPoint
+import org.osmdroid.util.BoundingBox
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
-import org.osmdroid.views.overlay.ScaleBarOverlay
-import org.osmdroid.views.overlay.compass.CompassOverlay
-import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider
-import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 class BikeMap : AppCompatActivity() {
     private lateinit var map : MapView
-    private lateinit var nbc: NextBikeClient
+    private lateinit var nbc : NextBikeClient
+    private lateinit var allCities : MutableList<City>
+    private lateinit var detailedCities : MutableList<City>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,47 +27,73 @@ class BikeMap : AppCompatActivity() {
         map.setTileSource(TileSourceFactory.MAPNIK)
         map.setUseDataConnection(true)
         map.isTilesScaledToDpi = true
-
         map.setMultiTouchControls(true)
 
         val mapController = map.controller
         mapController.setZoom(2.0)
-        //val startPoint = GeoPoint(49.0, 12.0)
-        //mapController.setCenter(startPoint)
-
         map.invalidate()
 
         nbc = NextBikeClient(this)
 
-        addCountriesToMap()
-        //addCityToMap(21)
+        detailedCities = mutableListOf()
+        allCities = mutableListOf()
+        getAllCities()
+
+        map.addMapListener(DelayedMapListener(object: MapAdapter() {
+            override fun onScroll(event: ScrollEvent?): Boolean {
+                findCitiesInBoundingBoxBelowZoomAndAddToMap(allCities, map.boundingBox, map.zoomLevelDouble)
+                return super.onScroll(event)
+            }
+            override fun onZoom(event: ZoomEvent): Boolean {
+                findCitiesInBoundingBoxBelowZoomAndAddToMap(allCities, map.boundingBox, map.zoomLevelDouble)
+                return super.onZoom(event)
+            }
+        }, 200))
+
     }
 
-    private fun addCountriesToMap() {
-        nbc.getCountries() { countries ->
-            for (country in countries) {
-                addCountryToMap(country)
+    private fun findCitiesInBoundingBoxBelowZoomAndAddToMap(cities: MutableList<City>, bb: BoundingBox, zoom: Double) {
+        val foundCities: MutableList<City> = mutableListOf()
+        for (city in cities) {
+            if (bb.contains(city.getPoint()) && zoom >= city.getZoomLevel() && city.getAvailableBikeCount() > 0) {
+                foundCities.add(city)
             }
         }
+        foundCities.removeAll(detailedCities)
+        for (city in foundCities) {
+                //TODO: Handle failing requests
+                map.overlays.remove(city.getMarker())
+                addPlacesOfCityToMap(city.getUID())
+                detailedCities.add(city)
+        }
+    }
+    private fun addCitiesToMap(cities: MutableList<City>) {
+        for (city in cities) {
+                addCityToMap(city)
+            }
         map.invalidate()
     }
 
-    private fun addCountryToMap(country: Country) {
-        val newMarker = Marker(map)
-        newMarker.position = country.getPoint()
-        newMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-
-        newMarker.icon = if (country.registrationNeeded()) {
-            ContextCompat.getDrawable(this, R.drawable.ic_location_unavailable_bike)
-        } else {
-            ContextCompat.getDrawable(this, R.drawable.ic_location_available_bike)
+    private fun getAllCities() {
+        nbc.getCountries() { countries ->
+            for (country in countries) {
+                allCities.addAll(country.getCities())
+            }
+            addCitiesToMap(allCities)
         }
+    }
 
-        newMarker.title = country.getDescription()
+    private fun addCityToMap(city: City) {
+        val newMarker = Marker(map)
+        newMarker.position = city.getPoint()
+        newMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        newMarker.icon = ContextCompat.getDrawable(this, R.drawable.ic_location_unavailable_bike)
+        newMarker.title = city.getDescription()
+        city.setMarker(newMarker)
         map.overlays.add(newMarker)
     }
 
-    private fun addCityToMap(id: Number) {
+    private fun addPlacesOfCityToMap(id: Number) {
         nbc.getPlacesOfCity(id) {
                 places ->
             for (place in places) {

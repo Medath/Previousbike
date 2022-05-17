@@ -9,10 +9,10 @@ import org.json.JSONObject
 
 class NextBikeClient(ctx: Context) {
 
-    //val listCitiesUrl = "https://maps.nextbike.net/maps/nextbike-official.json?list_cities=1"
-    //private val liveUrl = "https://maps.nextbike.net/maps/nextbike-live.json?city="
-    private val listCitiesUrl = "https://3deep5.me/exk/list_cities.json"
-    private val liveUrl = "https://3deep5.me/exk/nextbike-live.json"
+    private val listCitiesUrl = "https://maps.nextbike.net/maps/nextbike-official.json?list_cities=1"
+    private val liveUrl = "https://maps.nextbike.net/maps/nextbike-live.json?city="
+    //private val listCitiesUrl = "https://3deep5.me/exk/list_cities.json"
+    //private val liveUrl = "https://3deep5.me/exk/nextbike-live.json"
     private val context: Context = ctx
     private val queue: RequestQueue = Volley.newRequestQueue(ctx)
     private lateinit var listCities: JSONObject
@@ -31,10 +31,10 @@ class NextBikeClient(ctx: Context) {
         }
     }
 
-    fun getPlacesOfCity(id: Number, callback: (places: List<Place>) -> Unit) {
+    fun getPlacesOfCity(uid: Number, callback: (places: List<Place>) -> Unit) {
         val places: MutableList<Place> = mutableListOf()
 
-        makeJSONRequest(liveUrl + id.toString()) {
+        makeJSONRequest(liveUrl + uid.toString()) {
             response ->
             val cities = response.getJSONArray("countries").getJSONObject(0).getJSONArray("cities")
 
