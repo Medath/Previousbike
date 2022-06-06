@@ -20,7 +20,7 @@ class City (private val location: GeoPoint,
     }
 
     fun getMarker(): Marker { return marker }
-
+    fun getName(): String { return name }
     fun getDescription(): String {
         var str = name + "\n"
 

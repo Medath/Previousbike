@@ -3,12 +3,14 @@ package com.example.myapplication
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 
 import org.osmdroid.config.Configuration.*
 import org.osmdroid.events.*
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.BoundingBox
+import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 
@@ -75,7 +77,7 @@ class BikeMap : AppCompatActivity() {
     }
 
     private fun getAllCities() {
-        nbc.getCountries() { countries ->
+        nbc.getCountries { countries ->
             for (country in countries) {
                 allCities.addAll(country.getCities())
             }
@@ -84,8 +86,14 @@ class BikeMap : AppCompatActivity() {
     }
 
     private fun addCityToMap(city: City) {
+        val pt = city.getPoint()
+        if (!areCoordinatesValid(pt)) {
+            //TODO: hardcoded string
+            Toast.makeText(this, "Adding ${city.getName()} failed. Invalid coordinates: $pt", Toast.LENGTH_LONG).show()
+            return
+        }
         val newMarker = Marker(map)
-        newMarker.position = city.getPoint()
+        newMarker.position = pt
         newMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         newMarker.icon = ContextCompat.getDrawable(this, R.drawable.ic_location_unavailable_bike)
         newMarker.title = city.getDescription()
@@ -104,8 +112,14 @@ class BikeMap : AppCompatActivity() {
     }
 
     private fun addPlaceToMap(place: Place) {
+        val pt = place.getPoint()
+        if (!areCoordinatesValid(pt)) {
+            //TODO: hardcoded string
+            Toast.makeText(this, "Adding ${place.getName()} failed. Invalid coordinates: $pt", Toast.LENGTH_LONG).show()
+            return
+        }
         val newMarker = Marker(map)
-        newMarker.position = place.getPoint()
+        newMarker.position = pt
         newMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         newMarker.icon = if (place.isAvailable()) {
             ContextCompat.getDrawable(this, R.drawable.ic_location_available_bike)
@@ -115,6 +129,11 @@ class BikeMap : AppCompatActivity() {
 
         newMarker.title = place.getDescription()
         map.overlays.add(newMarker)
+    }
+
+    private fun areCoordinatesValid(pt: GeoPoint): Boolean {
+        return (pt.longitude <= 180.0 && pt.longitude >= -180.0
+                && pt.latitude <= 90.0 && pt.latitude >= -90.0)
     }
 
     override fun onPause() {
