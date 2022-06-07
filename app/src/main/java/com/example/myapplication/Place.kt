@@ -2,11 +2,12 @@ package com.example.myapplication
 
 import org.json.JSONObject
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.Marker
 
 class Place(private val location: GeoPoint,
             private val name: String, private val isBike: Boolean,
             private val bikes: Int, private val availableBikes: Int
-) {
+) : Markable {
     companion object {
         @JvmStatic
         fun createPlaceFromJSON(obj: JSONObject): Place {
@@ -20,10 +21,11 @@ class Place(private val location: GeoPoint,
         }
     }
 
-    fun getPoint(): GeoPoint { return location }
-    fun getName(): String { return name }
+    private lateinit var marker: Marker
 
-    fun getDescription(): String {
+    override fun getPoint(): GeoPoint { return location }
+    override fun getName(): String { return name }
+    override fun getDescription(): String {
         var str = name + "\n"
 
         //TODO: hardcoded strings
@@ -44,6 +46,15 @@ class Place(private val location: GeoPoint,
         }
         return str.trim()
     }
+    override fun getMarkerIconInt(): Int {
+        return if (isAvailable()) {
+            R.drawable.ic_location_available_bike
+        } else {
+            R.drawable.ic_location_unavailable_bike
+        }
+    }
+    override fun setMarker(marker: Marker) { this.marker = marker }
+    override fun getMarker(): Marker { return marker }
 
     fun isAvailable(): Boolean { return getAvailableBikeCount() != 0 }
     fun isBike(): Boolean { return isBike }

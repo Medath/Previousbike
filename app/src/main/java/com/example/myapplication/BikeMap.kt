@@ -71,7 +71,7 @@ class BikeMap : AppCompatActivity() {
     }
     private fun addCitiesToMap(cities: MutableList<City>) {
         for (city in cities) {
-                addCityToMap(city)
+                addMarkableToMap(city)
             }
         map.invalidate()
     }
@@ -85,49 +85,29 @@ class BikeMap : AppCompatActivity() {
         }
     }
 
-    private fun addCityToMap(city: City) {
-        val pt = city.getPoint()
-        if (!areCoordinatesValid(pt)) {
-            //TODO: hardcoded string
-            Toast.makeText(this, "Adding ${city.getName()} failed. Invalid coordinates: $pt", Toast.LENGTH_LONG).show()
-            return
-        }
-        val newMarker = Marker(map)
-        newMarker.position = pt
-        newMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        newMarker.icon = ContextCompat.getDrawable(this, R.drawable.ic_location_unavailable_bike)
-        newMarker.title = city.getDescription()
-        city.setMarker(newMarker)
-        map.overlays.add(newMarker)
-    }
-
     private fun addPlacesOfCityToMap(id: Number) {
         nbc.getPlacesOfCity(id) {
                 places ->
             for (place in places) {
-                addPlaceToMap(place)
+                addMarkableToMap(place)
             }
             map.invalidate()
         }
     }
 
-    private fun addPlaceToMap(place: Place) {
-        val pt = place.getPoint()
+    private fun addMarkableToMap(mk: Markable) {
+        val pt = mk.getPoint()
         if (!areCoordinatesValid(pt)) {
             //TODO: hardcoded string
-            Toast.makeText(this, "Adding ${place.getName()} failed. Invalid coordinates: $pt", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Adding ${mk.getName()} failed. Invalid coordinates: $pt", Toast.LENGTH_LONG).show()
             return
         }
         val newMarker = Marker(map)
         newMarker.position = pt
         newMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-        newMarker.icon = if (place.isAvailable()) {
-            ContextCompat.getDrawable(this, R.drawable.ic_location_available_bike)
-        } else {
-            ContextCompat.getDrawable(this, R.drawable.ic_location_unavailable_bike)
-        }
-
-        newMarker.title = place.getDescription()
+        newMarker.icon = ContextCompat.getDrawable(this, mk.getMarkerIconInt())
+        newMarker.title = mk.getDescription()
+        mk.setMarker(newMarker)
         map.overlays.add(newMarker)
     }
 

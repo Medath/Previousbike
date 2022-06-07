@@ -7,21 +7,13 @@ class City (private val location: GeoPoint,
             private val name: String,
             private val zoomLevel: Double,
             private val availableBikes: Int,
-            private val uid: Int) {
+            private val uid: Int) : Markable {
 
     private lateinit var marker: Marker
 
-    fun getPoint(): GeoPoint { return location }
-    fun getZoomLevel(): Double { return zoomLevel }
-    fun getUID(): Int { return uid }
-
-    fun setMarker(marker: Marker) {
-        this.marker = marker
-    }
-
-    fun getMarker(): Marker { return marker }
-    fun getName(): String { return name }
-    fun getDescription(): String {
+    override fun getPoint(): GeoPoint { return location }
+    override fun getName(): String { return name }
+    override fun getDescription(): String {
         var str = name + "\n"
 
         //TODO: still hardcoded strings
@@ -33,6 +25,13 @@ class City (private val location: GeoPoint,
 
         return str.trim()
     }
+    override fun setMarker(marker: Marker) { this.marker = marker }
+    override fun getMarker(): Marker { return marker }
+    override fun getMarkerIconInt(): Int {
+        return R.drawable.ic_location_unavailable_bike
+    }
 
+    fun getZoomLevel(): Double { return zoomLevel }
+    fun getUID(): Int { return uid }
     fun getAvailableBikeCount(): Int { return availableBikes }
 }
