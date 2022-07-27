@@ -5,15 +5,16 @@ import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Marker
 
-class Place(private val location: GeoPoint,
+class Place(private val location: GeoPoint, private val cityName: String,
             private val name: String, private val isBike: Boolean,
             private val bikes: Int, private val availableBikes: Int
 ) : Markable {
     companion object {
         @JvmStatic
-        fun createPlaceFromJSON(obj: JSONObject): Place {
+        fun createPlaceFromJSON(obj: JSONObject, cityName: String): Place {
             return Place(
                 GeoPoint(obj.getDouble("lat"), obj.getDouble(("lng"))),
+                cityName,
                 obj.getString("name"),
                 obj.getBoolean("bike"),
                 obj.getInt("bikes"),
@@ -27,7 +28,8 @@ class Place(private val location: GeoPoint,
     override fun getPoint(): GeoPoint { return location }
     override fun getName(): String { return name }
     override fun getDescription(): String {
-        var str = name + "\n"
+        var str = "$cityName\n"
+        str += name + "\n"
 
         //TODO: hardcoded strings
         if (isBike()) {

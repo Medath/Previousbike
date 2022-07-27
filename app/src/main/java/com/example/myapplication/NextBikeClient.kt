@@ -39,9 +39,10 @@ class NextBikeClient(ctx: Context) {
             val cities = response.getJSONArray("countries").getJSONObject(0).getJSONArray("cities")
 
             for (i in 0 until cities.length()) {
-                val jsonPlaces = cities.getJSONObject(i).getJSONArray("places")
+                val jsonCity = cities.getJSONObject(i)
+                val jsonPlaces = jsonCity.getJSONArray("places")
                 for (j in 0 until jsonPlaces.length()) {
-                    places.add(Place.createPlaceFromJSON(jsonPlaces.getJSONObject(j)))
+                    places.add(Place.createPlaceFromJSON(jsonPlaces.getJSONObject(j), jsonCity.getString("name")))
                 }
             }
             callback.invoke(places)
