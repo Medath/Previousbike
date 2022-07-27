@@ -57,7 +57,7 @@ class BikeMap : AppCompatActivity() {
     private fun findCitiesInBoundingBoxBelowZoomAndAddToMap(cities: MutableList<City>, bb: BoundingBox, zoom: Double) {
         val foundCities: MutableList<City> = mutableListOf()
         for (city in cities) {
-            if (bb.contains(city.getPoint()) && zoom >= city.getZoomLevel() && city.getAvailableBikeCount() > 0) {
+            if (city.intersects(bb) && zoom >= city.getZoomLevel() && city.getAvailableBikeCount() > 0) {
                 foundCities.add(city)
             }
         }

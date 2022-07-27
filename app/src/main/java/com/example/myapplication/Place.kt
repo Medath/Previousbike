@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import org.json.JSONObject
+import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Marker
 
@@ -55,6 +56,7 @@ class Place(private val location: GeoPoint,
     }
     override fun setMarker(marker: Marker) { this.marker = marker }
     override fun getMarker(): Marker { return marker }
+    override fun intersects(checkBB: BoundingBox): Boolean { return checkBB.contains(getPoint()) }
 
     fun isAvailable(): Boolean { return getAvailableBikeCount() != 0 }
     fun isBike(): Boolean { return isBike }

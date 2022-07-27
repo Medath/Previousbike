@@ -1,9 +1,11 @@
 package com.example.myapplication
 
+import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Marker
 
 class City (private val location: GeoPoint,
+            private val BB: BoundingBox,
             private val name: String,
             private val zoomLevel: Double,
             private val availableBikes: Int,
@@ -12,6 +14,15 @@ class City (private val location: GeoPoint,
     private lateinit var marker: Marker
 
     override fun getPoint(): GeoPoint { return location }
+    override fun intersects(checkBB: BoundingBox): Boolean {
+        return (
+                BB.actualNorth >= checkBB.actualSouth
+            &&  BB.lonWest <= checkBB.lonEast
+            &&  BB.lonEast >= checkBB.lonWest
+            &&  BB.actualSouth <= checkBB.actualNorth
+        )
+    }
+
     override fun getName(): String { return name }
     override fun getDescription(): String {
         var str = name + "\n"

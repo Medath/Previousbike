@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import org.json.JSONArray
 import org.json.JSONObject
+import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 
 class Country(private val location: GeoPoint,
@@ -32,8 +33,12 @@ class Country(private val location: GeoPoint,
 
         for (i in 0 until citiesJSON.length()) {
             val city = citiesJSON.getJSONObject(i)
+            val north_east: JSONObject = city.getJSONObject("bounds").getJSONObject("north_east")
+            val south_west: JSONObject = city.getJSONObject("bounds").getJSONObject("south_west")
             cities.add(City(
                     GeoPoint(city.getDouble("lat"), city.getDouble("lng")),
+                    BoundingBox(north_east.getDouble("lat"), north_east.getDouble("lng"),
+                        south_west.getDouble("lat"), south_west.getDouble("lng")),
                     city.getString("name"),
                     city.getInt("zoom").toDouble(),
                     city.getInt("available_bikes"),
