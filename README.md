@@ -9,7 +9,7 @@ It is currently in alpha, with many essential features missing. Use at your own 
     - [x] Gray out unavailable bikes
     - [ ] Use appropriate icons depending on zoom level to keep the map clean
     - [x] Dynamically request available bikes depending on zoom level, map location, and user location
-        - [ ] Dynamically remove bikes from the map when zooming out far enough
+        - [x] Dynamically remove bikes from the map when zooming out far enough
     - [ ] Let users rent bikes from the map
 - [ ] Accounts
     - [ ] Implement account login

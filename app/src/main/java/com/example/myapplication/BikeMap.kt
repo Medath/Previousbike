@@ -18,7 +18,7 @@ class BikeMap : AppCompatActivity() {
     private lateinit var map : MapView
     private lateinit var nbc : NextBikeClient
     private lateinit var allCities : MutableList<City>
-    private lateinit var detailedCities : MutableList<City>
+    private lateinit var detailedCities : HashMap<City, MutableSet<Place>>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,36 +37,49 @@ class BikeMap : AppCompatActivity() {
 
         nbc = NextBikeClient(this)
 
-        detailedCities = mutableListOf()
+        detailedCities = hashMapOf()
         allCities = mutableListOf()
         getAllCities()
 
         map.addMapListener(DelayedMapListener(object: MapAdapter() {
             override fun onScroll(event: ScrollEvent?): Boolean {
-                findCitiesInBoundingBoxBelowZoomAndAddToMap(allCities, map.boundingBox, map.zoomLevelDouble)
+                addDetailedCitiesToMap(allCities, map.boundingBox, map.zoomLevelDouble)
                 return super.onScroll(event)
             }
             override fun onZoom(event: ZoomEvent): Boolean {
-                findCitiesInBoundingBoxBelowZoomAndAddToMap(allCities, map.boundingBox, map.zoomLevelDouble)
+                addDetailedCitiesToMap(allCities, map.boundingBox, map.zoomLevelDouble)
                 return super.onZoom(event)
             }
         }, 200))
 
     }
 
-    private fun findCitiesInBoundingBoxBelowZoomAndAddToMap(cities: MutableList<City>, bb: BoundingBox, zoom: Double) {
-        val foundCities: MutableList<City> = mutableListOf()
+    private fun shouldBeDetailed(city: City, bb: BoundingBox, zoom: Double): Boolean {
+        return city.intersects(bb) && zoom >= city.getZoomLevel() && city.getAvailableBikeCount() > 0
+    }
+
+    private fun addDetailedCitiesToMap(cities: MutableList<City>, bb: BoundingBox, zoom: Double) {
+        val foundCities: MutableSet<City> = mutableSetOf()
+
         for (city in cities) {
-            if (city.intersects(bb) && zoom >= city.getZoomLevel() && city.getAvailableBikeCount() > 0) {
+            if (detailedCities.containsKey(city)) {
+                if (shouldBeDetailed(city, bb, zoom + 3.0)) {
+                    continue
+                } else {
+                    removePlacesOfCityFromMap(city)
+                    detailedCities.remove(city)
+                }
+            }
+            if (shouldBeDetailed(city, bb, zoom)) {
                 foundCities.add(city)
             }
         }
-        foundCities.removeAll(detailedCities)
+        foundCities.removeAll(detailedCities.keys)
         for (city in foundCities) {
                 //TODO: Handle failing requests
-                map.overlays.remove(city.getMarker())
-                addPlacesOfCityToMap(city.getUID())
-                detailedCities.add(city)
+                removeMarkableFromMap(city)
+                detailedCities[city] = mutableSetOf()
+                addPlacesOfCityToMap(city)
         }
     }
     private fun addCitiesToMap(cities: MutableList<City>) {
@@ -85,14 +98,22 @@ class BikeMap : AppCompatActivity() {
         }
     }
 
-    private fun addPlacesOfCityToMap(id: Number) {
-        nbc.getPlacesOfCity(id) {
+    private fun addPlacesOfCityToMap(city: City) {
+        nbc.getPlacesOfCity(city.getUID()) {
                 places ->
             for (place in places) {
                 addMarkableToMap(place)
+                detailedCities[city]?.add(place)
             }
             map.invalidate()
         }
+    }
+
+    private fun removePlacesOfCityFromMap(city: City) {
+        for (place in detailedCities[city]!!) {
+            removeMarkableFromMap(place)
+        }
+        addMarkableToMap(city)
     }
 
     private fun addMarkableToMap(mk: Markable) {
@@ -109,6 +130,10 @@ class BikeMap : AppCompatActivity() {
         newMarker.title = mk.getDescription()
         mk.setMarker(newMarker)
         map.overlays.add(newMarker)
+    }
+
+    private fun removeMarkableFromMap(mk: Markable) {
+        map.overlays.remove(mk.getMarker())
     }
 
     private fun areCoordinatesValid(pt: GeoPoint): Boolean {
