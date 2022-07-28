@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="what_to_do">Was möchten sie tun?</string>
+    <string name="show_map">Karte ansehen</string>
+    <string name="unlock_a_bike">Fahrrad ausleihen</string>
+    <string name="add_marker_error">Adding %1$s failed. Invalid coordinates: %2$s</string>
+    <string name="available">Verfügbar</string>
+    <string name="not_available">Nicht verfügbar</string>
+    <string name="bike">Fahrrad</string>
+    <string name="station">Station</string>
+    <string name="no_bikes_available">Keine Fahrräder verfügbar</string>
+    <string name="bikes_available">Fahrräder verfügbar</string>
+</resources>
