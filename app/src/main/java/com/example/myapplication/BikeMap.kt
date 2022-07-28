@@ -119,15 +119,14 @@ class BikeMap : AppCompatActivity() {
     private fun addMarkableToMap(mk: Markable) {
         val pt = mk.getPoint()
         if (!areCoordinatesValid(pt)) {
-            //TODO: hardcoded string
-            Toast.makeText(this, "Adding ${mk.getName()} failed. Invalid coordinates: $pt", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.add_marker_error, mk.getName(), pt.toString()), Toast.LENGTH_LONG).show()
             return
         }
         val newMarker = Marker(map)
         newMarker.position = pt
         newMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         newMarker.icon = ContextCompat.getDrawable(this, mk.getMarkerIconInt())
-        newMarker.title = mk.getDescription()
+        newMarker.title = mk.getDescription(this)
         mk.setMarker(newMarker)
         map.overlays.add(newMarker)
     }

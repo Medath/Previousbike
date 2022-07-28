@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Context
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Marker
@@ -24,14 +25,13 @@ class City (private val location: GeoPoint,
     }
 
     override fun getName(): String { return name }
-    override fun getDescription(): String {
+    override fun getDescription(c: Context): String {
         var str = name + "\n"
 
-        //TODO: still hardcoded strings
         str += if (getAvailableBikeCount() > 0) {
-            getAvailableBikeCount().toString() + " bikes available\n"
+            getAvailableBikeCount().toString() + " " + c.getString(R.string.bikes_available) + "\n"
         } else {
-            "no bikes available\n"
+            c.getString(R.string.no_bikes_available) + "\n"
         }
 
         return str.trim()

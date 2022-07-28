@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Context
 import org.json.JSONObject
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
@@ -27,24 +28,23 @@ class Place(private val location: GeoPoint, private val cityName: String,
 
     override fun getPoint(): GeoPoint { return location }
     override fun getName(): String { return name }
-    override fun getDescription(): String {
+    override fun getDescription(c: Context): String {
         var str = "$cityName\n"
         str += name + "\n"
 
-        //TODO: hardcoded strings
         if (isBike()) {
-            str += "Bike\n"
+            str += c.getString(R.string.bike) + "\n"
             str += if (getAvailableBikeCount() > 0) {
-                "Available\n"
+                c.getString(R.string.available) + "\n"
             } else {
-                "Not available\n"
+                c.getString(R.string.not_available) + "\n"
             }
         } else {
-            str += "Station\n"
+            str += c.getString(R.string.station) + "\n"
             str += if (getAvailableBikeCount() > 0) {
-                getAvailableBikeCount().toString() + " bikes available\n"
+                getAvailableBikeCount().toString() + " " + c.getString(R.string.bikes_available) + "\n"
             } else {
-                "No bikes available\n"
+                c.getString(R.string.no_bikes_available) + "\n"
             }
         }
         return str.trim()
