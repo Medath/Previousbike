@@ -11,4 +11,7 @@
     <string name="station">Station</string>
     <string name="no_bikes_available">Keine Fahrräder verfügbar</string>
     <string name="bikes_available">Fahrräder verfügbar</string>
+    <string name="phone_number">Telefonnummer</string>
+    <string name="pin">PIN</string>
+    <string name="sign_in">Einloggen</string>
 </resources>

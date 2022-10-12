@@ -10,4 +10,7 @@
     <string name="station">Station</string>
     <string name="no_bikes_available">No bikes available</string>
     <string name="bikes_available">bikes available</string>
+    <string name="phone_number">Phone number</string>
+    <string name="pin">PIN</string>
+    <string name="sign_in">Sign in</string>
 </resources>
