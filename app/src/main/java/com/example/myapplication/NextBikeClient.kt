@@ -11,10 +11,8 @@ import org.json.JSONObject
 
 object NextBikeClient {
 
-    private const val listCitiesUrl = "https://maps.nextbike.net/maps/nextbike-official.json?list_cities=1"
-    private const val liveUrl = "https://maps.nextbike.net/maps/nextbike-live.json?city="
-    //private val listCitiesUrl = "https://3deep5.me/exk/list_cities.json"
-    //private val liveUrl = "https://3deep5.me/exk/nextbike-live.json"
+    private const val listCitiesUrl = "https://api.nextbike.net/maps/nextbike-official.json?list_cities=1"
+    private const val liveUrl = "https://api.nextbike.net/maps/nextbike-live.json?city="
     private val queue: RequestQueue = RequestQueue(NoCache(), BasicNetwork(HurlStack()))
 
     private var loggedIn = false
@@ -65,7 +63,6 @@ object NextBikeClient {
     }
 
     private fun makeJSONRequest(context: Context, url: String, callback: (response: JSONObject) -> Unit) {
-        Toast.makeText(context, url, Toast.LENGTH_SHORT).show()
         val rq = JsonObjectRequest(url,
             {
                 response -> callback.invoke(response)
