@@ -12,7 +12,7 @@ It is currently in alpha, with many essential features missing. Use at your own 
         - [x] Dynamically remove bikes from the map when zooming out far enough
     - [ ] Let users rent bikes from the map
 - [ ] Accounts
-    - [ ] Implement account login
+    - [x] Implement account login
     - [ ] Let user view account information
         - [ ] Status of currently rented bikes
         - [ ] History of rented bikes
