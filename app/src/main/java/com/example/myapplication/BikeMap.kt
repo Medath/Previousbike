@@ -16,7 +16,6 @@ import org.osmdroid.views.overlay.Marker
 
 class BikeMap : AppCompatActivity() {
     private lateinit var map : MapView
-    private lateinit var nbc : NextBikeClient
     private lateinit var allCities : MutableList<City>
     private lateinit var detailedCities : HashMap<City, MutableSet<Place>>
 
@@ -34,8 +33,6 @@ class BikeMap : AppCompatActivity() {
         val mapController = map.controller
         mapController.setZoom(2.0)
         map.invalidate()
-
-        nbc = NextBikeClient(this)
 
         detailedCities = hashMapOf()
         allCities = mutableListOf()
@@ -90,7 +87,7 @@ class BikeMap : AppCompatActivity() {
     }
 
     private fun getAllCities() {
-        nbc.getCountries { countries ->
+        NextBikeClient.getCountries(this) { countries ->
             for (country in countries) {
                 allCities.addAll(country.getCities())
             }
@@ -99,7 +96,7 @@ class BikeMap : AppCompatActivity() {
     }
 
     private fun addPlacesOfCityToMap(city: City) {
-        nbc.getPlacesOfCity(city.getUID()) {
+        NextBikeClient.getPlacesOfCity(this, city.getUID()) {
                 places ->
             for (place in places) {
                 addMarkableToMap(place)

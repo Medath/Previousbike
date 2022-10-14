@@ -7,7 +7,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class LoginActivity : AppCompatActivity() {
@@ -18,12 +17,8 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login_screen)
 
-        setContentView(R.layout.login_screen)
-        Toast.makeText(this, "AAAAAAAAAAAAAAA", Toast.LENGTH_SHORT).show()
-
-
-        phoneTextField = findViewById<EditText>(R.id.editTextPhone)
-        pinTextField = findViewById<EditText>(R.id.editTextPIN)
+        phoneTextField = findViewById(R.id.editTextPhone)
+        pinTextField = findViewById(R.id.editTextPIN)
         val buttonSignIn = findViewById<Button>(R.id.SignInButton)
 
         val tw = object : TextWatcher {
@@ -36,6 +31,7 @@ class LoginActivity : AppCompatActivity() {
 
         phoneTextField.addTextChangedListener(tw)
         pinTextField.addTextChangedListener(tw)
+        buttonSignIn.setOnClickListener { NextBikeClient.logIn(this, pinTextField.text.toString(), phoneTextField.text.toString()) }
     }
 
     private fun maybeEnableButton(btn: Button) {
