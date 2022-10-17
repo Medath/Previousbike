@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 
+import android.content.Intent
 import android.os.Bundle
 import android.telephony.PhoneNumberUtils
 import android.text.Editable
@@ -31,7 +32,12 @@ class LoginActivity : AppCompatActivity() {
 
         phoneTextField.addTextChangedListener(tw)
         pinTextField.addTextChangedListener(tw)
-        buttonSignIn.setOnClickListener { NextBikeClient.logIn(this, pinTextField.text.toString(), phoneTextField.text.toString()) }
+        buttonSignIn.setOnClickListener {
+            NextBikeClient.logIn(this, pinTextField.text.toString(), phoneTextField.text.toString()) {
+                val intent = Intent(this, BikeRentActivity::class.java)
+                startActivity(intent)
+            }
+        }
     }
 
     private fun maybeEnableButton(btn: Button) {

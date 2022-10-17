@@ -15,44 +15,72 @@ object NextBikeClient {
 
     private val queue: RequestQueue = RequestQueue(NoCache(), BasicNetwork(HurlStack()))
 
-    private var loggedIn = false
     private var apiKey = ""
     private lateinit var user: Account
 
-    class Account (private val loginToken: String) {
+    class Account (private val loginToken: String, private val balance: Int, private val currency: String, private val fullName: String) {
+
+        companion object {
+            @JvmStatic
+            fun createAccountFromJSON(json: JSONObject): Account {
+                val userJson = json.getJSONObject("user")
+                return Account(
+                    userJson.getString("loginkey"),
+                    userJson.getInt("credits"),
+                    userJson.getString("currency"),
+                    userJson.getString("screen_name")
+                )
+            }
+        }
 
         fun getLoginToken(): String {
             return loginToken
         }
         fun getBalance(): Int {
-            return -1
+            return balance
+        }
+        fun getCurrency(): String {
+            return currency
+        }
+        fun getFullName(): String {
+            return fullName
+        }
+
+        override fun toString(): String {
+            return "Token: ${getLoginToken()}\n" +
+                    "Balance: ${getBalance().toFloat()/100} ${getCurrency()}\n" +
+                    "Name: ${getFullName()}"
         }
     }
 
     init {
         queue.start()
-
     }
 
     fun isLoggedIn(): Boolean {
-        return loggedIn
+        //TODO: Check local storage if already logged in and login is not timed out
+        return this::user.isInitialized
     }
 
-    fun logIn(context: Context, PIN: String, phoneNumber: String) {
+    fun logIn(context: Context, PIN: String, phoneNumber: String, callback: () -> Unit) {
         if (isLoggedIn()) {
             Toast.makeText(context, "Already logged in...", Toast.LENGTH_SHORT).show()
             return
         }
 
+        //TODO: Store obtained login information locally
         obtainApiKeyIfNecessary(context) {
             apiKey ->
-            makePostJSONRequest(context, loginUrl, mutableMapOf("apikey" to apiKey, "mobile" to phoneNumber, "pin" to PIN, "show_errors" to "1")) {
+                makePostJSONRequest(context, loginUrl, mutableMapOf("apikey" to apiKey, "mobile" to phoneNumber, "pin" to PIN, "show_errors" to "1")) {
                     response ->
-                Toast.makeText(context, "Logged in probably successfully...\n${response.toString(1)}", Toast.LENGTH_LONG).show()
-            }
+                        user = Account.createAccountFromJSON(response)
+                        callback.invoke()
+                }
         }
+    }
 
-        //loggedIn = true
+    fun getUser(): Account {
+        return user
     }
 
     fun getCountries(context: Context, callback: (countries: List<Country>) -> Unit) {

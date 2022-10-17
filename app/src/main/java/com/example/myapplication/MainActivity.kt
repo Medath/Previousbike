@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,12 +17,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun launchBikeRentActivity(view: View) {
-        if (NextBikeClient.isLoggedIn()) {
-            Toast.makeText(this, "not implemented", Toast.LENGTH_SHORT).show()
+        val intent = if (NextBikeClient.isLoggedIn()) {
+            Intent(this, BikeRentActivity::class.java)
         } else {
-            Toast.makeText(this, "not logged in", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+            Intent(this, LoginActivity::class.java)
         }
+        startActivity(intent)
     }
 }

@@ -31,6 +31,10 @@
             android:name=".LoginActivity"
             android:exported="false">
         </activity>
+        <activity
+            android:name=".BikeRentActivity"
+            android:exported="false">
+        </activity>
     </application>
 
 </manifest>
