@@ -4,7 +4,9 @@ import android.content.Context
 import android.widget.Toast
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.*
+import org.json.JSONException
 import org.json.JSONObject
+import java.io.File
 
 object NextBikeClient {
 
@@ -57,23 +59,42 @@ object NextBikeClient {
         queue.start()
     }
 
-    fun isLoggedIn(): Boolean {
-        //TODO: Check local storage if already logged in and login is not timed out
-        return this::user.isInitialized
+    fun isLoggedIn(context: Context): Boolean {
+        if (this::user.isInitialized) {
+            return true
+        }
+
+        val file = File(context.filesDir, "sessiondata.json")
+        if (file.exists()) {
+            try {
+                user = Account.createAccountFromJSON(JSONObject(file.readText()))
+                return true
+            } catch(e: JSONException) {
+                //File contains invalid JSON, just ignore it because it will be overwritten on a successful login anyway
+            } catch(e: Exception) {
+                Toast.makeText(context, "Something unexpected happened while reading session data:\n${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+        return false
     }
 
     fun logIn(context: Context, PIN: String, phoneNumber: String, callback: () -> Unit) {
-        if (isLoggedIn()) {
+        if (isLoggedIn(context)) {
             Toast.makeText(context, "Already logged in...", Toast.LENGTH_SHORT).show()
             return
         }
 
-        //TODO: Store obtained login information locally
         obtainApiKeyIfNecessary(context) {
             apiKey ->
                 makePostJSONRequest(context, loginUrl, mutableMapOf("apikey" to apiKey, "mobile" to phoneNumber, "pin" to PIN, "show_errors" to "1")) {
                     response ->
                         user = Account.createAccountFromJSON(response)
+                        try {
+                            File(context.filesDir, "sessiondata.json")
+                                .writeText(response.toString(4))
+                        } catch(e: Exception) {
+                            Toast.makeText(context, "Storing session data failed: ${e.javaClass.canonicalName}\n${e.message}", Toast.LENGTH_SHORT).show()
+                        }
                         callback.invoke()
                 }
         }

@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun launchBikeRentActivity(view: View) {
-        val intent = if (NextBikeClient.isLoggedIn()) {
+        val intent = if (NextBikeClient.isLoggedIn(this)) {
             Intent(this, BikeRentActivity::class.java)
         } else {
             Intent(this, LoginActivity::class.java)
